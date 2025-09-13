@@ -1,0 +1,68 @@
+# If switch to an aws based image is not feasible, please use Dockerfile_NonAwsImage instead
+ARG FUNCTION_DIR="/app"
+
+# to use a non-aws based image: https://docs.aws.amazon.com/lambda/latest/dg/nodejs-image.html#nodejs-image-clients
+FROM node:24-bookworm
+
+ARG FUNCTION_DIR
+
+# # Install build dependencies for lambda-ric
+# For alpine-based image
+# RUN apk update && \
+#     apk add --no-cache \
+#     libstdc++ \
+#     build-base \
+#     libtool \
+#     autoconf \
+#     automake \
+#     elfutils-dev \
+#     make \
+#     cmake \
+#     libcurl \
+#     python3
+
+# # required to install aws-lambda-ric
+# RUN apk add --no-cache --update --repository=https://dl-cdn.alpinelinux.org/alpine/v3.16/main/ libexecinfo-dev
+
+
+# For debian based image
+RUN apt-get update && \
+    apt-get install -y \
+    g++ \
+    make \
+    cmake \
+    autoconf \
+    automake \
+    libtool \
+    m4 \
+    python3 \
+    python3-setuptools \
+    unzip \
+    libcurl4-openssl-dev \
+    libssl-dev \
+    build-essential
+
+
+WORKDIR ${FUNCTION_DIR}
+
+# Install the runtime interface client
+RUN npm install aws-lambda-ric
+
+# Lambda: Read-only file system
+# by default npm writes logs under /home/.npm
+ENV NPM_CONFIG_CACHE=/tmp/.npm
+
+
+COPY package*.json ./
+
+RUN npm install --omit=dev
+
+COPY . .
+RUN npm run build
+
+# If not using an aws-based Lambda image, uncomment the following
+# Set runtime interface client as default command for the container runtime
+ENTRYPOINT ["/usr/local/bin/npx", "aws-lambda-ric"]
+
+# Pass the name of the function handler as an argument to the runtime
+CMD ["build/index.handler"]

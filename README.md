@@ -8,4 +8,4 @@ This repository includes sample code and dockerfile for each of the approaches a
     - [With AWS Based Image](./lambda/WithServerless/Dockerfile)
     - [With Non-AWS Based image](./lambda/WithServerless/Dockerfile_NonAwsImage)
 
-For more details, please refer to my article [Serve Dockerized Express App (Typescript) As Lambda 2 Ways.]()
+For more details, please refer to my article [Serve Dockerized Express App (Typescript) As Lambda 2 Ways.](https://medium.com/@itsuki.enjoy/serve-dockerized-express-app-typescript-as-lambda-2-ways-62f4cc606887)
